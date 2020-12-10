@@ -1,3 +1,5 @@
+// importa as configurações
+require('dotenv').config();
 // Realiza o require do express, http, e socketio
 var app = require('express')();
 // passa o express para o http-server
@@ -6,18 +8,19 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 // cria uma rota para fornecer o arquivo index.html
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
+
 // sempre que o socketio receber uma conexão vai devoltar realizar o broadcast dela
-io.on('connection', function (socket) {
+io.on('connection', socket => {
     socket.on('chat message', function (msg) {
         io.emit('chat message', msg);
     });
 });
 
 // inicia o servidor na porta informada
-const PORT = process.env.PORT || process.env.WEBCHAT_SERVER || 3000;
-http.listen(3000, function () {
-    console.log('Servidor rodando em: http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+http.listen(PORT, () => {
+    console.log(`Servidor rodando em: http://localhost:${PORT}`);
 });
