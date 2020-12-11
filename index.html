@@ -59,73 +59,44 @@
 </head>
 
 <body>
-    <!--  Lista de mensagens -->
-    <ul class="ul" id="messages"></ul>
-    <!--  input com e botão de submit-->
-    <div class="send">
-        <input class='text' autofocus id="menssagem" autocomplete="off" placeholder="Não digite bobagens aki!" />
-        <button class='btn' id='enviar_menssagem'>Enviar</button>
+    <div id="app">
+        <!--  Lista de mensagens -->
+        <ul class="ul" id="messages"></ul>
+        <!--  input com e botão de submit-->
+        <div class="send">
+            <input class='text' v-model="username" autofocus id="usuario" autocomplete="off" placeholder="Username" />
+            <button class='btn' id='set_username' @click="join">Entrar</button>
+        </div>
+
+        <div class="salas">
+
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <!--  importar o client do socketIO-->
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // faz com que seja possível enviar mensagens com Enter
-        document.getElementById('menssagem').addEventListener('keypress', function (e) {
-            var key = e.which || e.keyCode;
-            if (key == 13) {
-                enviar_menssagem();
-            }
-        });
-        // inicia o client socketIO
-        var socket = io();
-        // Abre um popup perguntando o nome da pessoa
-        var nome_usuario = prompt("Qual seu nome?");
-        // Lista com alguns nomes do Final Fantasy
-        var ff = [
-            "Cloud Strife",
-            "Sephiroth",
-            "Vincent Valentine",
-            "Zack Fair",
-            "Aerith Gainsborough",
-            "Tifa Lockhart",
-            "Barret Wallace",
-            "Yuffie Kisaragi",
-        ];
-        // Caso usuário não informe um nome será atribuido um nome aleatório da lista
-        if (nome_usuario === null || nome_usuario == "" || nome_usuario == " ") {
-            nome_usuario = ff[Math.floor(Math.random() * ff.length)];
-        }
 
-        socket.emit('setUserName', { "userName": nome_usuario })
+        new Vue({
+            el: '#app',
+            data: {
+                socket: null,
+                username: '',
+            },
+            methods: {
+                join() {
+                    this.socket.emit('join_chat', this.username);
+                }
+            },
+            mounted() {
+                this.socket = io();
 
-        socket.emit('chat message', "Bem vindo! " + nome_usuario);
-        // adiciona um addEventListener para o botão de submit
-        document.getElementById('enviar_menssagem').addEventListener("click", enviar_menssagem);
-        // cria a função que conecta no websocket e emite a mensagem
-        function enviar_menssagem() {
-            // salva a mensagem como uma string
-            msg = document.getElementById('menssagem').value;
-            if (msg.length > 0) {
-                console.log(msg);
-                // concatena o nome de usuário e a mensagem para enviar ao socketIo
-                socket.emit('chat message', nome_usuario + ": " + msg);
-                // reseta o valor do input da mensagem
-                document.getElementById('menssagem').value = "";
+                this.socket.on('enter', msg => {
+                    alert(msg);
+                })
             }
-        }
-        // sempre que receber uma mensagem ela é adicionada a lista
-        socket.on('chat message', msg => {
-            // busca o elemento UL
-            let ul = document.getElementById("messages");
-            // cria um elemento LI
-            let li = document.createElement('li');
-            // cria o elemento de quebra de linha
-            let br = document.createElement('br');
-            li.appendChild(document.createTextNode(msg));
-            // adicionar o nome do usuário quebra a linha e adicionar a mensagem à lista de mensagems
-            ul.appendChild(li);
-        });
+        })
 
     </script>
 </body>

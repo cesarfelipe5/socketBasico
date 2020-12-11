@@ -13,6 +13,11 @@ const socket = require('./src/socket');
 
 const conection = require('./conection');
 
+app.use((req, res, next) => {
+    req.io = io;
+    return next();
+});
+
 socket(io, conection);
 
 app.use(routes);
