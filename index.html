@@ -97,6 +97,8 @@
             nome_usuario = ff[Math.floor(Math.random() * ff.length)];
         }
 
+        socket.emit('setUserName', { "userName": nome_usuario })
+
         socket.emit('chat message', "Bem vindo! " + nome_usuario);
         // adiciona um addEventListener para o botão de submit
         document.getElementById('enviar_menssagem').addEventListener("click", enviar_menssagem);
@@ -113,7 +115,7 @@
             }
         }
         // sempre que receber uma mensagem ela é adicionada a lista
-        socket.on('chat message', function (msg) {
+        socket.on('chat message', msg => {
             // busca o elemento UL
             let ul = document.getElementById("messages");
             // cria um elemento LI
